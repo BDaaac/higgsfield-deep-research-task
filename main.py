@@ -24,6 +24,9 @@ import sys
 import webbrowser
 from pathlib import Path
 
+from dotenv import load_dotenv
+load_dotenv()
+
 
 def cmd_run(args: argparse.Namespace) -> None:
     from eval.reporter import build_report, print_report, save_report

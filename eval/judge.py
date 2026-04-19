@@ -1,9 +1,9 @@
-"""LLM-as-judge using claude-haiku-4-5-20251001 with structured output via tool_use.
+"""LLM-as-judge using claude-3-5-haiku-20241022 with structured output via tool_use.
 
 Design notes:
-- Same cost tier as the agent under test (claude-haiku-4-5). claude-3-haiku-20240307
-  was the original cheaper choice but was removed from the API; haiku-4-5 is the
-  current equivalent. Self-preference risk is noted in README.
+- Judge is claude-3-5-haiku ($0.80/$4 per MTok) — cheaper than the agent under
+  test (claude-haiku-4-5, $1/$5) and a different model generation, which partially
+  mitigates self-preference bias. Override via EVAL_JUDGE_MODEL env var.
 - Structured output enforced via Anthropic tool_use — no third-party libraries.
 - Rubric is per-metric (checked-in .md files), never a generic prompt.
 - Known failure modes documented in README: position bias, self-preference,
@@ -20,7 +20,7 @@ from anthropic import Anthropic
 
 from eval.models import JudgeVerdict
 
-JUDGE_MODEL = os.getenv("EVAL_JUDGE_MODEL", "claude-haiku-4-5-20251001")
+JUDGE_MODEL = os.getenv("EVAL_JUDGE_MODEL", "claude-3-5-haiku-20241022")
 
 _VERDICT_TOOL = {
     "name": "submit_verdict",

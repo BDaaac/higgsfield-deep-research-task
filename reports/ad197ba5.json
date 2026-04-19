@@ -1,0 +1,143 @@
+{
+  "run_id": "ad197ba5",
+  "timestamp": "2026-04-19T08:22:45.556145+00:00",
+  "model": "claude-haiku-4-5",
+  "repeats": 1,
+  "pass_mode": "strict",
+  "pass_threshold": 1.0,
+  "total_cases": 1,
+  "passed": 1,
+  "failed": 0,
+  "pass_rate": 1.0,
+  "total_cost_usd": 0.010517,
+  "p50_latency_ms": 17984.0,
+  "p95_latency_ms": 17984.0,
+  "mean_tool_calls": 4.0,
+  "cases": [
+    {
+      "case_id": "happy_r1_payload",
+      "repeat_idx": 0,
+      "trace_path": "traces\\ad197ba5\\happy_r1_payload\\repeat_0.json",
+      "summary": {
+        "run_id": "c2b0eb61-d49c-44f6-90ac-dd9e6527b46a",
+        "stopped_reason": "finish",
+        "final_answer": "The maximum payload of the Acme R1 arm is 5 kg. According to the official technical specifications, the Acme R1 is a mid-size mobile manipulation platform intended for light industrial and research use, and it comes equipped with a six-degree-of-freedom arm capable of handling a maximum payload of 5 kilograms.",
+        "citations": [
+          "https://corpus.local/acme-r1-specs"
+        ],
+        "total_tokens": {
+          "input": 7497,
+          "output": 604
+        },
+        "cost_usd": 0.010517,
+        "wall_time_ms": 17984,
+        "tool_calls": [
+          {
+            "name": "web_search",
+            "args": {
+              "query": "Acme R1 arm maximum payload"
+            }
+          },
+          {
+            "name": "fetch_url",
+            "args": {
+              "url": "https://corpus.local/acme-r1-specs"
+            }
+          },
+          {
+            "name": "extract_quotes",
+            "args": {
+              "text": "# Acme Robotics R1 \u2013 Technical Specifications\n\nThe Acme R1 is a mid-size mobile manipulation platform intended for light industrial and research use.\n\n**Key specifications:**\n\n- Dimensions: 82 cm x 54 cm x 110 cm (stowed)\n- Mass: 38 kg\n- Maximum payload (arm): 5 kg\n- Maximum runtime on a single charge: 6 hours\n- Operating temperature: 0\u00b0C to 40\u00b0C\n- Connectivity: Wi-Fi 6, Ethernet, optional 5G\n- SDK: Python and C++ bindings, ROS 2 Humble compatible\n\nThe R1 ships with a six-degree-of-freedom arm, a parallel-jaw gripper (swappable), a 2D LIDAR, and stereo RGB-D cameras for navigation and manipulation.",
+              "topic": "maximum payload arm"
+            }
+          },
+          {
+            "name": "finish",
+            "args": {
+              "answer": "The maximum payload of the Acme R1 arm is 5 kg. According to the official technical specifications, the Acme R1 is a mid-size mobile manipulation platform intended for light industrial and research use, and it comes equipped with a six-degree-of-freedom arm capable of handling a maximum payload of 5 kilograms.",
+              "citations": [
+                "https://corpus.local/acme-r1-specs"
+              ]
+            }
+          }
+        ],
+        "error": null
+      },
+      "assertion_results": [
+        {
+          "check": "tool_called",
+          "passed": true,
+          "reason": "'web_search' was called.",
+          "score": null,
+          "critical": true
+        },
+        {
+          "check": "tool_called",
+          "passed": true,
+          "reason": "'fetch_url' was called.",
+          "score": null,
+          "critical": true
+        },
+        {
+          "check": "stopped_reason",
+          "passed": true,
+          "reason": "stopped_reason == 'finish'.",
+          "score": null,
+          "critical": true
+        },
+        {
+          "check": "answer_contains",
+          "passed": true,
+          "reason": "Answer contains '5 kg'.",
+          "score": null,
+          "critical": true
+        },
+        {
+          "check": "citations_fetched",
+          "passed": true,
+          "reason": "All citations were fetched via fetch_url.",
+          "score": null,
+          "critical": true
+        },
+        {
+          "check": "answer_word_count_lte",
+          "passed": true,
+          "reason": "Answer has 50 words <= 120.",
+          "score": null,
+          "critical": true
+        },
+        {
+          "check": "correctness[correctness]",
+          "passed": true,
+          "reason": "The agent's answer is completely correct and fully supported by the corpus. The agent states that \"the maximum payload of the Acme R1 arm is 5 kg,\" which directly matches the corpus specification that lists \"Maximum payload (arm): 5 kg\" under the technical specifications. The agent also correctly identifies the R1 as a \"mid-size mobile manipulation platform intended for light industrial and research use\" and accurately notes that it is \"equipped with a six-degree-of-freedom arm,\" all of which are verbatim from the corpus. Every factual claim in the answer is traceable to the provided corpus snippet, with no errors, omissions, or unsupported inferences.",
+          "score": 1.0,
+          "critical": false
+        }
+      ],
+      "passed": true,
+      "failure_reason": null,
+      "soft_score": 1.0
+    }
+  ],
+  "flakiness": [],
+  "diff": {
+    "prev_run_id": "f6734546",
+    "regressions": [],
+    "improvements": [],
+    "deltas": [
+      {
+        "case_id": "happy_r1_payload",
+        "prev_passed": true,
+        "curr_passed": true,
+        "latency_delta_pct": 1.128787878787879,
+        "cost_delta_pct": 0.02695049311590667,
+        "tool_calls_delta": 0.0,
+        "judge_score_delta": 0.0
+      }
+    ],
+    "latency_regression_cases": [
+      "happy_r1_payload"
+    ],
+    "cost_regression_cases": []
+  }
+}
