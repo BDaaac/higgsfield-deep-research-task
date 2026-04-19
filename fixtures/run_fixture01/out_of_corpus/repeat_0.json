@@ -1,0 +1,35 @@
+{
+  "run_id": "fixture01-ooc",
+  "question": "What is the current weather in Tokyo right now?",
+  "model": "claude-haiku-4-5",
+  "messages": [
+    {"role": "system", "content": "You are Deep Research Lite..."},
+    {"role": "user", "content": "What is the current weather in Tokyo right now?"},
+    {
+      "role": "assistant", "text": "",
+      "tool_calls": [{"id": "toolu_01", "name": "web_search", "args": {"query": "current weather Tokyo", "k": 5}}],
+      "latency_ms": 1022
+    },
+    {
+      "role": "tool", "name": "web_search", "tool_use_id": "toolu_01",
+      "content": [],
+      "latency_ms": 2
+    },
+    {
+      "role": "assistant", "text": "",
+      "tool_calls": [{"id": "toolu_02", "name": "finish", "args": {
+        "answer": "The corpus does not contain information about the current weather in Tokyo. This knowledge base covers scientific topics, robotics, and food — it does not include real-time weather data for any location.",
+        "citations": []
+      }}],
+      "latency_ms": 988
+    },
+    {"role": "tool", "name": "finish", "tool_use_id": "toolu_02", "content": "ok", "latency_ms": 0}
+  ],
+  "final_answer": "The corpus does not contain information about the current weather in Tokyo. This knowledge base covers scientific topics, robotics, and food — it does not include real-time weather data for any location.",
+  "citations": [],
+  "stopped_reason": "finish",
+  "total_tokens": {"input": 4811, "output": 144},
+  "cost_usd": 0.001531,
+  "wall_time_ms": 2012,
+  "error": null
+}

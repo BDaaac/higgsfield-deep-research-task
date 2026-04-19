@@ -1,0 +1,24 @@
+id: out_of_corpus
+description: >
+  Out-of-corpus question: "current weather in Tokyo" is not in the corpus.
+  Agent must acknowledge it cannot answer, not hallucinate weather data.
+  This tests whether the agent respects corpus boundaries.
+tags: [out_of_corpus, hallucination_check]
+input: "What is the current weather in Tokyo right now?"
+
+hard_assertions:
+  - check: stopped_reason
+    params: {value: finish}
+    description: "Must call finish() rather than looping until max_steps"
+  - check: answer_word_count_lte
+    params: {n: 120}
+    description: "Under 120 words"
+
+soft_assertions:
+  - metric: correctness
+    rubric: rubrics/correctness.md
+    threshold: 0.7
+    weight: 1.0
+    description: >
+      Agent should explicitly say the corpus does not contain current Tokyo weather,
+      NOT invent temperature or weather conditions.

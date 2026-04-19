@@ -1,0 +1,28 @@
+id: happy_voyager_heliopause
+description: "Happy path: ask when Voyager 1 crossed the heliopause. Multi-page topic."
+tags: [happy_path, space, voyager]
+input: "When did Voyager 1 cross the heliopause and enter interstellar space?"
+
+hard_assertions:
+  - check: tool_called
+    params: {tool: web_search}
+    description: "Must search"
+  - check: tool_called
+    params: {tool: fetch_url}
+    description: "Must fetch at least one page"
+  - check: stopped_reason
+    params: {value: finish}
+    description: "Must call finish()"
+  - check: citations_fetched
+    params: {}
+    description: "All citations must be fetched"
+  - check: answer_word_count_lte
+    params: {n: 120}
+    description: "Under 120 words"
+
+soft_assertions:
+  - metric: correctness
+    rubric: rubrics/correctness.md
+    threshold: 0.8
+    weight: 1.0
+    description: "Answer correctly states Voyager 1 crossed in 2012"

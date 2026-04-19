@@ -1,0 +1,86 @@
+{
+  "run_id": "fixture01-happy-r1",
+  "question": "What is the maximum payload of the Acme R1 arm?",
+  "model": "claude-haiku-4-5",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are Deep Research Lite, a research assistant.\n\nGiven a user question, use the available tools to find a well-cited answer from the provided corpus..."
+    },
+    {
+      "role": "user",
+      "content": "What is the maximum payload of the Acme R1 arm?"
+    },
+    {
+      "role": "assistant",
+      "text": "",
+      "tool_calls": [
+        {
+          "id": "toolu_01A",
+          "name": "web_search",
+          "args": {"query": "Acme R1 arm payload specifications", "k": 5}
+        }
+      ],
+      "latency_ms": 1243
+    },
+    {
+      "role": "tool",
+      "name": "web_search",
+      "tool_use_id": "toolu_01A",
+      "content": [
+        {"url": "https://corpus.local/acme-r1-specs", "title": "Acme Robotics R1 — Technical Specifications", "snippet": "…Maximum payload (arm): 5 kg…"},
+        {"url": "https://corpus.local/acme-r1-faq", "title": "Acme R1 — Community FAQ", "snippet": "…payload capacity questions…"},
+        {"url": "https://corpus.local/acme-r1-spec-imperial", "title": "Acme Robotics R1 — US Customer Datasheet", "snippet": "…Maximum payload (arm): 11 lb…"}
+      ],
+      "latency_ms": 3
+    },
+    {
+      "role": "assistant",
+      "text": "",
+      "tool_calls": [
+        {
+          "id": "toolu_02B",
+          "name": "fetch_url",
+          "args": {"url": "https://corpus.local/acme-r1-specs"}
+        }
+      ],
+      "latency_ms": 987
+    },
+    {
+      "role": "tool",
+      "name": "fetch_url",
+      "tool_use_id": "toolu_02B",
+      "content": "# Acme Robotics R1 — Technical Specifications\n\nThe Acme R1 is a mid-size mobile manipulation platform...\n\n**Key specifications:**\n\n- Dimensions: 82 cm x 54 cm x 110 cm (stowed)\n- Mass: 38 kg\n- Maximum payload (arm): 5 kg\n- Maximum runtime on a single charge: 6 hours\n- Operating temperature: 0°C to 40°C\n- Connectivity: Wi-Fi 6, Ethernet, optional 5G\n- SDK: Python and C++ bindings, ROS 2 Humble compatible",
+      "latency_ms": 1
+    },
+    {
+      "role": "assistant",
+      "text": "",
+      "tool_calls": [
+        {
+          "id": "toolu_03C",
+          "name": "finish",
+          "args": {
+            "answer": "The maximum payload of the Acme R1 arm is **5 kg**. According to the official technical specifications, the R1 ships with a six-degree-of-freedom arm capable of carrying up to 5 kilograms.",
+            "citations": ["https://corpus.local/acme-r1-specs"]
+          }
+        }
+      ],
+      "latency_ms": 876
+    },
+    {
+      "role": "tool",
+      "name": "finish",
+      "tool_use_id": "toolu_03C",
+      "content": "ok",
+      "latency_ms": 0
+    }
+  ],
+  "final_answer": "The maximum payload of the Acme R1 arm is **5 kg**. According to the official technical specifications, the R1 ships with a six-degree-of-freedom arm capable of carrying up to 5 kilograms.",
+  "citations": ["https://corpus.local/acme-r1-specs"],
+  "stopped_reason": "finish",
+  "total_tokens": {"input": 4821, "output": 187},
+  "cost_usd": 0.001758,
+  "wall_time_ms": 3109,
+  "error": null
+}

@@ -1,0 +1,30 @@
+id: citation_hallucination_r2
+description: >
+  Citation integrity check: asks about the Acme R2 launch event.
+  The corpus has acme-r2-launch.md. This test catches the planted bug where
+  the agent may list URLs in 'citations' that it never actually fetched via fetch_url.
+  The citations_fetched hard assertion is the primary detector here.
+tags: [citation_check, acme, bug_detection]
+input: "Tell me about the Acme R2 robot launch announcement."
+
+hard_assertions:
+  - check: citations_fetched
+    params: {}
+    critical: true
+    description: "CRITICAL: every URL in citations must appear as a fetch_url argument in the trace"
+  - check: stopped_reason
+    params: {value: finish}
+    description: "Must call finish()"
+  - check: tool_called
+    params: {tool: fetch_url}
+    description: "Must fetch at least one page"
+  - check: answer_word_count_lte
+    params: {n: 120}
+    description: "Under 120 words"
+
+soft_assertions:
+  - metric: correctness
+    rubric: rubrics/correctness.md
+    threshold: 0.75
+    weight: 1.0
+    description: "Answer should accurately describe the R2 launch per acme-r2-launch corpus page"

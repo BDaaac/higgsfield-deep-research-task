@@ -1,0 +1,48 @@
+{
+  "run_id": "fixture01-citation",
+  "question": "Tell me about the Acme R2 robot launch announcement.",
+  "model": "claude-haiku-4-5",
+  "messages": [
+    {"role": "system", "content": "You are Deep Research Lite..."},
+    {"role": "user", "content": "Tell me about the Acme R2 robot launch announcement."},
+    {
+      "role": "assistant", "text": "",
+      "tool_calls": [{"id": "toolu_01", "name": "web_search", "args": {"query": "Acme R2 robot launch announcement", "k": 5}}],
+      "latency_ms": 1055
+    },
+    {
+      "role": "tool", "name": "web_search", "tool_use_id": "toolu_01",
+      "content": [
+        {"url": "https://corpus.local/acme-r2-launch", "title": "Acme R2 Launch Announcement", "snippet": "...next generation robot..."},
+        {"url": "https://corpus.local/acme-press-q3", "title": "Acme Robotics Q3 Press Release", "snippet": "...quarterly results..."}
+      ],
+      "latency_ms": 2
+    },
+    {
+      "role": "assistant", "text": "",
+      "tool_calls": [{"id": "toolu_02", "name": "fetch_url", "args": {"url": "https://corpus.local/acme-r2-launch"}}],
+      "latency_ms": 988
+    },
+    {
+      "role": "tool", "name": "fetch_url", "tool_use_id": "toolu_02",
+      "content": "# Acme R2 Launch Announcement\n\nAcme Robotics is proud to announce the R2, our next-generation mobile manipulation platform. The R2 features improved payload capacity of 8 kg, extended runtime of 9 hours, and native ROS 2 Iron support.",
+      "latency_ms": 1
+    },
+    {
+      "role": "assistant", "text": "",
+      "tool_calls": [{"id": "toolu_03", "name": "finish", "args": {
+        "answer": "Acme Robotics announced the R2 as their next-generation mobile manipulation platform, featuring an 8 kg payload capacity, 9 hours of runtime, and native ROS 2 Iron support.",
+        "citations": ["https://corpus.local/acme-r2-launch", "https://corpus.local/acme-press-q3"]
+      }}],
+      "latency_ms": 876
+    },
+    {"role": "tool", "name": "finish", "tool_use_id": "toolu_03", "content": "ok", "latency_ms": 0}
+  ],
+  "final_answer": "Acme Robotics announced the R2 as their next-generation mobile manipulation platform, featuring an 8 kg payload capacity, 9 hours of runtime, and native ROS 2 Iron support.",
+  "citations": ["https://corpus.local/acme-r2-launch", "https://corpus.local/acme-press-q3"],
+  "stopped_reason": "finish",
+  "total_tokens": {"input": 5233, "output": 187},
+  "cost_usd": 0.001966,
+  "wall_time_ms": 2922,
+  "error": null
+}

@@ -1,0 +1,19 @@
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Virtual environments
+.venv/
+venv/
+
+# Local secrets
+.env
+
+# Local run artifacts (keep curated fixtures and reports)
+traces/
+
+# Auto-generated symlink report — always overwritten, no value to commit
+reports/latest.json
+
+# Transient local run reports (not curated fixtures)
+reports/e3dce07e*

@@ -1,0 +1,34 @@
+id: imperial_metric_dimensions
+description: >
+  Unit confusion test: user explicitly asks for R1 dimensions in inches.
+  The corpus has both acme-r1-specs.md (metric: 82×54×110 cm) and
+  acme-r1-spec-imperial.md (imperial: 32.3×21.3×43.3 in).
+  Agent should use the imperial datasheet directly, NOT convert the metric values.
+  Converted values may introduce rounding errors and won't exactly match the datasheet.
+tags: [unit_confusion, acme, specs, bug_detection]
+input: "What are the stowed dimensions of the Acme R1 in inches?"
+
+hard_assertions:
+  - check: stopped_reason
+    params: {value: finish}
+    description: "Must call finish()"
+  - check: answer_contains
+    params: {substring: "32.3"}
+    description: "Answer should contain the imperial value 32.3 in (from the imperial datasheet)"
+  - check: citations_fetched
+    params: {}
+    critical: true
+    description: "All citations must be fetched"
+  - check: answer_word_count_lte
+    params: {n: 120}
+    description: "Under 120 words"
+
+soft_assertions:
+  - metric: correctness
+    rubric: rubrics/correctness.md
+    threshold: 0.8
+    weight: 1.0
+    description: >
+      Agent should cite the imperial datasheet (acme-r1-spec-imperial) and give the
+      values 32.3 × 21.3 × 43.3 inches. A converted metric answer (e.g. 32.28 in)
+      is technically close but not sourced from the correct page.

@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Eval Viewer</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: monospace; font-size: 13px; background: #0d1117; color: #c9d1d9; }
+  #header { background: #161b22; border-bottom: 1px solid #30363d; padding: 16px 24px; }
+  #header h1 { font-size: 18px; color: #58a6ff; }
+  #header .meta { color: #8b949e; margin-top: 4px; }
+  #summary { display: flex; gap: 24px; padding: 16px 24px; background: #161b22;
+             border-bottom: 1px solid #30363d; flex-wrap: wrap; }
+  .stat { text-align: center; }
+  .stat .val { font-size: 24px; font-weight: bold; }
+  .stat .lbl { color: #8b949e; font-size: 11px; margin-top: 2px; }
+  .pass-rate { color: #3fb950; }
+  .fail-rate { color: #f85149; }
+  #cases { padding: 16px 24px; }
+  .case { border: 1px solid #30363d; border-radius: 6px; margin-bottom: 12px;
+          background: #161b22; overflow: hidden; }
+  .case.failed { border-color: #f85149; }
+  .case.passed { border-color: #3fb950; }
+  .case-header { display: flex; align-items: center; gap: 8px; padding: 10px 14px;
+                 cursor: pointer; user-select: none; }
+  .case-header:hover { background: #1f2937; }
+  .badge { font-size: 11px; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
+  .badge.pass { background: #1a4731; color: #3fb950; }
+  .badge.fail { background: #4b1113; color: #f85149; }
+  .case-id { font-weight: bold; flex: 1; }
+  .case-meta { color: #8b949e; font-size: 11px; }
+  .case-body { border-top: 1px solid #30363d; padding: 14px; display: none; }
+  .case-body.open { display: block; }
+  .section-title { color: #8b949e; font-size: 11px; text-transform: uppercase;
+                   letter-spacing: 0.5px; margin: 12px 0 6px; }
+  .question { color: #e6edf3; background: #0d1117; padding: 8px; border-radius: 4px; margin-bottom: 8px; }
+  .answer { color: #e6edf3; background: #0d1117; padding: 8px; border-radius: 4px;
+            white-space: pre-wrap; word-break: break-word; }
+  .assertion { display: flex; gap: 8px; padding: 4px 0; border-bottom: 1px solid #21262d; }
+  .assertion:last-child { border-bottom: none; }
+  .a-icon { width: 14px; flex-shrink: 0; }
+  .a-check { color: #8b949e; flex: 1; }
+  .a-reason { color: #8b949e; font-size: 11px; }
+  .a-pass .a-icon { color: #3fb950; }
+  .a-fail .a-icon { color: #f85149; }
+  .a-fail .a-check { color: #f85149; }
+  details { margin: 4px 0; }
+  summary { cursor: pointer; padding: 5px 8px; background: #0d1117; border-radius: 4px;
+            list-style: none; display: flex; align-items: center; gap: 6px; }
+  summary::-webkit-details-marker { display: none; }
+  summary::before { content: "▶"; font-size: 9px; color: #8b949e; transition: transform 0.15s; }
+  details[open] summary::before { transform: rotate(90deg); }
+  .tool-name { color: #79c0ff; font-weight: bold; }
+  .tool-url { color: #a5d6ff; }
+  .tool-io { padding: 8px; background: #0d1117; margin-top: 4px; border-radius: 4px; }
+  .tool-io pre { white-space: pre-wrap; word-break: break-word; max-height: 300px;
+                 overflow-y: auto; color: #c9d1d9; font-size: 12px; }
+  .tool-label { color: #8b949e; font-size: 10px; text-transform: uppercase; margin-bottom: 3px; }
+  .citations { margin-top: 4px; }
+  .citations a { color: #58a6ff; text-decoration: none; }
+  .citations a:hover { text-decoration: underline; }
+  .diff-block { margin-top: 16px; padding: 12px; background: #0d1117; border-radius: 6px; }
+  .diff-block h3 { color: #e6edf3; margin-bottom: 8px; }
+  .regression { color: #f85149; }
+  .improvement { color: #3fb950; }
+  .warning { color: #d29922; }
+  #flakiness { padding: 0 24px 24px; }
+  .flak-table { width: 100%; border-collapse: collapse; }
+  .flak-table th { text-align: left; color: #8b949e; font-size: 11px; padding: 6px 8px;
+                   border-bottom: 1px solid #30363d; }
+  .flak-table td { padding: 6px 8px; border-bottom: 1px solid #21262d; }
+  .stopped-error { color: #f85149; }
+  .stopped-finish { color: #3fb950; }
+  .stopped-max_steps { color: #d29922; }
+</style>
+</head>
+<body>
+
+<script type="application/json" id="run-data">__RUN_DATA_PLACEHOLDER__</script>
+
+<div id="header">
+  <h1>Deep Research Eval Viewer</h1>
+  <div class="meta" id="run-meta"></div>
+</div>
+<div id="summary"></div>
+<div id="cases"></div>
+<div id="flakiness"></div>
+
+<script>
+const data = JSON.parse(document.getElementById('run-data').textContent);
+
+// --- Header ---
+document.getElementById('run-meta').textContent =
+  `Run: ${data.run_id}  |  Model: ${data.model}  |  ${data.timestamp}`;
+
+// --- Summary stats ---
+const pct = (data.pass_rate * 100).toFixed(1);
+const passClass = data.pass_rate >= 0.8 ? 'pass-rate' : 'fail-rate';
+document.getElementById('summary').innerHTML = `
+  <div class="stat"><div class="val ${passClass}">${pct}%</div><div class="lbl">Pass Rate</div></div>
+  <div class="stat"><div class="val">${data.passed}/${data.total_cases}</div><div class="lbl">Cases</div></div>
+  <div class="stat"><div class="val">$${(data.total_cost_usd||0).toFixed(4)}</div><div class="lbl">Total Cost</div></div>
+  <div class="stat"><div class="val">${data.p50_latency_ms}ms</div><div class="lbl">p50 Latency</div></div>
+  <div class="stat"><div class="val">${data.p95_latency_ms}ms</div><div class="lbl">p95 Latency</div></div>
+  <div class="stat"><div class="val">${(data.mean_tool_calls||0).toFixed(1)}</div><div class="lbl">Avg Tools</div></div>
+`;
+
+// --- Diff block ---
+function renderDiff(diff) {
+  if (!diff) return '';
+  const regs = (diff.regressions||[]).map(id => `<span class="regression">✗ ${id}</span>`).join(', ');
+  const imps = (diff.improvements||[]).map(id => `<span class="improvement">✓ ${id}</span>`).join(', ');
+  const lats = (diff.latency_regression_cases||[]).map(id => `<span class="warning">⚠ ${id}</span>`).join(', ');
+  const costs = (diff.cost_regression_cases||[]).map(id => `<span class="warning">⚠ ${id}</span>`).join(', ');
+  return `<div class="diff-block">
+    <h3>Diff vs ${diff.prev_run_id}</h3>
+    ${regs ? `<div>🔴 Regressions: ${regs}</div>` : ''}
+    ${imps ? `<div>🟢 Improvements: ${imps}</div>` : ''}
+    ${lats ? `<div>⚠️ Latency +20%: ${lats}</div>` : ''}
+    ${costs ? `<div>⚠️ Cost +20%: ${costs}</div>` : ''}
+    ${!regs && !imps && !lats && !costs ? '<div style="color:#3fb950">No regressions.</div>' : ''}
+  </div>`;
+}
+
+// --- Tool call rendering ---
+function renderToolCall(tc, idx) {
+  const name = tc.name || '?';
+  const args = tc.args || {};
+  const url = args.url ? `<span class="tool-url">${args.url}</span>` : '';
+  const query = args.query ? `<span class="tool-url">"${args.query}"</span>` : '';
+  const label = url || query || '';
+  return `<details>
+    <summary>
+      <span class="tool-name">${name}</span>${label ? ' → ' + label : ''}
+    </summary>
+    <div class="tool-io">
+      <div class="tool-label">Input</div>
+      <pre>${escHtml(JSON.stringify(args, null, 2))}</pre>
+    </div>
+  </details>`;
+}
+
+function renderFullTrace(trace) {
+  if (!trace) return '<i style="color:#8b949e">Trace file not found.</i>';
+  const msgs = trace.messages || [];
+  let html = '';
+  for (const msg of msgs) {
+    if (msg.role === 'tool') {
+      const content = typeof msg.content === 'object'
+        ? JSON.stringify(msg.content, null, 2)
+        : String(msg.content || '');
+      html += `<details style="margin:3px 0">
+        <summary><span style="color:#8b949e">tool_result</span> ← ${escHtml(msg.name || '')}</summary>
+        <div class="tool-io"><pre>${escHtml(content.slice(0, 3000))}</pre></div>
+      </details>`;
+    } else if (msg.role === 'assistant') {
+      const calls = msg.tool_calls || [];
+      for (const tc of calls) {
+        html += renderToolCall(tc, 0);
+      }
+      if (msg.text) {
+        html += `<div style="padding:4px 8px;color:#c9d1d9"><em>${escHtml(msg.text)}</em></div>`;
+      }
+    }
+  }
+  return html || '<i style="color:#8b949e">No messages.</i>';
+}
+
+function escHtml(s) {
+  return String(s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;');
+}
+
+// --- Assertions ---
+function renderAssertions(results) {
+  if (!results || !results.length) return '';
+  return results.map(r => {
+    const cls = r.passed ? 'a-pass' : 'a-fail';
+    const icon = r.passed ? '✓' : '✗';
+    const score = r.score != null ? ` <span style="color:#8b949e">[${r.score.toFixed(2)}]</span>` : '';
+    return `<div class="assertion ${cls}">
+      <span class="a-icon">${icon}</span>
+      <span class="a-check">${escHtml(r.check)}${score}</span>
+      <span class="a-reason">${escHtml(r.reason || '')}</span>
+    </div>`;
+  }).join('');
+}
+
+// --- Cases ---
+const casesEl = document.getElementById('cases');
+let casesHtml = `<div style="margin-bottom:12px">${renderDiff(data.diff)}</div>`;
+
+for (const c of (data.cases || [])) {
+  const passed = c.passed;
+  const cls = passed ? 'passed' : 'failed';
+  const badge = passed
+    ? '<span class="badge pass">PASS</span>'
+    : '<span class="badge fail">FAIL</span>';
+
+  const s = c.summary || {};
+  const stoppedCls = `stopped-${s.stopped_reason || 'unknown'}`;
+  const toolCalls = (s.tool_calls || []);
+  const citations = (s.citations || []);
+
+  const caseId = `case-${c.case_id}-${c.repeat_idx}`;
+
+  casesHtml += `
+  <div class="case ${cls}">
+    <div class="case-header" onclick="toggle('${caseId}')">
+      ${badge}
+      <span class="case-id">${escHtml(c.case_id)}</span>
+      <span class="case-meta">
+        repeat ${c.repeat_idx} &nbsp;|&nbsp;
+        <span class="${stoppedCls}">${s.stopped_reason || '?'}</span> &nbsp;|&nbsp;
+        ${toolCalls.length} tools &nbsp;|&nbsp;
+        ${s.wall_time_ms || 0}ms &nbsp;|&nbsp;
+        $${(s.cost_usd || 0).toFixed(5)}
+      </span>
+    </div>
+    <div class="case-body" id="${caseId}">
+      ${c.failure_reason
+        ? `<div style="color:#f85149;padding:6px 0;margin-bottom:8px">✗ ${escHtml(c.failure_reason)}</div>`
+        : ''}
+
+      <div class="section-title">Answer</div>
+      <div class="answer">${escHtml(s.final_answer || '(no answer)')}</div>
+
+      ${citations.length ? `
+      <div class="section-title">Citations</div>
+      <div class="citations">${citations.map(u => `<a href="${escHtml(u)}" target="_blank">${escHtml(u)}</a>`).join('<br>')}</div>
+      ` : ''}
+
+      <div class="section-title">Assertions</div>
+      ${renderAssertions(c.assertion_results)}
+
+      <div class="section-title">Tool Call Timeline</div>
+      ${renderFullTrace(c.full_trace)}
+    </div>
+  </div>`;
+}
+
+casesEl.innerHTML = casesHtml;
+
+// --- Flakiness ---
+if (data.flakiness && data.flakiness.length) {
+  let rows = data.flakiness.map(fl => `
+    <tr>
+      <td>${escHtml(fl.case_id)}</td>
+      <td>${fl.k_passed}/${fl.n_total}</td>
+      <td>${(fl.pass_rate*100).toFixed(0)}%</td>
+      <td>${fl.judge_score.mean.toFixed(2)} ± ${fl.judge_score.stddev.toFixed(2)}</td>
+      <td>${fl.latency_ms.mean.toFixed(0)}ms (min ${fl.latency_ms.minimum}, max ${fl.latency_ms.maximum})</td>
+      <td>$${fl.cost_usd.mean.toFixed(5)}</td>
+    </tr>`).join('');
+  document.getElementById('flakiness').innerHTML = `
+    <div class="section-title" style="padding:0 0 8px">Flakiness (repeats=${data.repeats})</div>
+    <table class="flak-table">
+      <thead><tr>
+        <th>Case</th><th>K/N</th><th>Pass%</th>
+        <th>Judge Score μ±σ</th><th>Latency</th><th>Cost</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+}
+
+function toggle(id) {
+  const el = document.getElementById(id);
+  if (el) el.classList.toggle('open');
+}
+</script>
+</body>
+</html>

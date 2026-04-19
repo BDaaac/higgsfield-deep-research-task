@@ -1,0 +1,27 @@
+id: ambiguous_temperature
+description: >
+  Ambiguous prompt: two corpus pages give R1 temperature range in different units
+  (acme-r1-specs: 0–40°C; acme-r1-spec-imperial: 32–104 without explicit unit label).
+  Agent should disclose the ambiguity or clarify which unit system it is using.
+tags: [ambiguous, acme, specs, units]
+input: "What is the operating temperature range of the Acme R1?"
+
+hard_assertions:
+  - check: stopped_reason
+    params: {value: finish}
+    description: "Must call finish() — ambiguity should be disclosed, not cause timeout"
+  - check: answer_word_count_lte
+    params: {n: 120}
+    description: "Under 120 words"
+
+soft_assertions:
+  - metric: correctness
+    rubric: rubrics/correctness.md
+    threshold: 0.6
+    weight: 0.5
+    description: "Answer should mention both unit systems or flag the ambiguity"
+  - metric: tool_efficiency
+    rubric: rubrics/tool_efficiency.md
+    threshold: 0.6
+    weight: 0.5
+    description: "Agent should fetch both spec pages to spot the conflict"

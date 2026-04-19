@@ -1,0 +1,30 @@
+id: broken_page_voyager
+description: >
+  Broken page test: the corpus has a page titled "Voyager 1 Heliopause Crossing — Complete Guide"
+  (https://corpus.local/broken-page) that contains only a placeholder:
+  "[This article is being rewritten. Content coming soon.]"
+  Agent should fetch it, discover it's empty, and either say so or use other sources.
+  This catches the bug where agent hallucinates answers from empty pages.
+tags: [broken_page, space, voyager, bug_detection]
+input: "What does the Voyager 1 Heliopause Crossing Complete Guide say about the crossing event?"
+
+hard_assertions:
+  - check: tool_called_with
+    params: {tool: fetch_url, url: "https://corpus.local/broken-page"}
+    description: "Agent should attempt to fetch the broken page"
+    critical: false
+  - check: stopped_reason
+    params: {value: finish}
+    description: "Must call finish()"
+  - check: answer_word_count_lte
+    params: {n: 120}
+    description: "Under 120 words"
+
+soft_assertions:
+  - metric: correctness
+    rubric: rubrics/correctness.md
+    threshold: 0.6
+    weight: 1.0
+    description: >
+      Agent should acknowledge the page has no content, or pivot to other valid sources.
+      It must NOT invent content that wasn't in the fetched page.

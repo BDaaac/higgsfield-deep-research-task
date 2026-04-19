@@ -1,0 +1,45 @@
+{
+  "run_id": "fixture01-sequence",
+  "question": "What is the mass of the Acme R1 robot in kilograms?",
+  "model": "claude-haiku-4-5",
+  "messages": [
+    {"role": "system", "content": "You are Deep Research Lite..."},
+    {"role": "user", "content": "What is the mass of the Acme R1 robot in kilograms?"},
+    {
+      "role": "assistant", "text": "",
+      "tool_calls": [{"id": "toolu_01", "name": "web_search", "args": {"query": "Acme R1 mass weight kilograms", "k": 5}}],
+      "latency_ms": 1044
+    },
+    {
+      "role": "tool", "name": "web_search", "tool_use_id": "toolu_01",
+      "content": [{"url": "https://corpus.local/acme-r1-specs", "title": "Acme Robotics R1 — Technical Specifications", "snippet": "Mass: 38 kg"}],
+      "latency_ms": 2
+    },
+    {
+      "role": "assistant", "text": "",
+      "tool_calls": [{"id": "toolu_02", "name": "fetch_url", "args": {"url": "https://corpus.local/acme-r1-specs"}}],
+      "latency_ms": 1002
+    },
+    {
+      "role": "tool", "name": "fetch_url", "tool_use_id": "toolu_02",
+      "content": "# Acme Robotics R1 — Technical Specifications\n\n- Mass: 38 kg\n- Maximum payload (arm): 5 kg",
+      "latency_ms": 1
+    },
+    {
+      "role": "assistant", "text": "",
+      "tool_calls": [{"id": "toolu_03", "name": "finish", "args": {
+        "answer": "The Acme R1 robot has a mass of **38 kilograms**, as stated in the official technical specifications.",
+        "citations": ["https://corpus.local/acme-r1-specs"]
+      }}],
+      "latency_ms": 876
+    },
+    {"role": "tool", "name": "finish", "tool_use_id": "toolu_03", "content": "ok", "latency_ms": 0}
+  ],
+  "final_answer": "The Acme R1 robot has a mass of **38 kilograms**, as stated in the official technical specifications.",
+  "citations": ["https://corpus.local/acme-r1-specs"],
+  "stopped_reason": "finish",
+  "total_tokens": {"input": 4944, "output": 155},
+  "cost_usd": 0.001719,
+  "wall_time_ms": 2924,
+  "error": null
+}

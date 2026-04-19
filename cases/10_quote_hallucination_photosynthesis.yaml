@@ -1,0 +1,35 @@
+id: quote_hallucination_photosynthesis
+description: >
+  Quote hallucination detector: asks for exact quotes about photosynthesis light reactions.
+  The corpus has multiple photosynthesis pages (photosynthesis.md, photosynthesis-notes.md,
+  photosynthesis-handout.md, photosynthesis-mirror.md).
+  extract_quotes is known to occasionally return paraphrased text.
+  The judge checks whether the quoted text actually appears verbatim in the cited source.
+  This directly tests the planted defect in tools.py (line 139 comment).
+tags: [quote_check, hallucination, bug_detection, photosynthesis]
+input: "Give me exact verbatim quotes from your sources about how photosynthesis converts light energy."
+
+hard_assertions:
+  - check: tool_called
+    params: {tool: extract_quotes}
+    description: "Agent should use extract_quotes for this kind of request"
+    critical: false
+  - check: citations_fetched
+    params: {}
+    critical: true
+    description: "All citations must be fetched"
+  - check: stopped_reason
+    params: {value: finish}
+    description: "Must call finish()"
+  - check: answer_word_count_lte
+    params: {n: 120}
+    description: "Under 120 words"
+
+soft_assertions:
+  - metric: correctness
+    rubric: rubrics/quote_accuracy.md
+    threshold: 0.7
+    weight: 1.0
+    description: >
+      Judge checks: do the quotes attributed to corpus pages actually appear verbatim
+      (or near-verbatim) in those pages? Paraphrased 'quotes' should fail this check.
