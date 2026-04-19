@@ -112,15 +112,17 @@ def cmd_diff(args: argparse.Namespace) -> None:
     with curr_path.open() as f:
         curr = json.load(f)
 
+    pass_mode = curr.get("pass_mode", "strict")
+    pass_threshold = float(curr.get("pass_threshold", 1.0))
+
     # Reconstruct results-by-case from curr report cases list
     from collections import defaultdict
-    from eval.models import CaseRepeatResult
 
     by_case: dict[str, list] = defaultdict(list)
     for c in curr.get("cases", []):
         by_case[c["case_id"]].append(c)
 
-    diff = compute_diff(prev, dict(by_case), "strict", 1.0)
+    diff = compute_diff(prev, dict(by_case), pass_mode, pass_threshold)
 
     print(f"\nDiff: {prev['run_id']} → {curr['run_id']}")
     print(f"  Regressions  : {diff.regressions or ['none']}")

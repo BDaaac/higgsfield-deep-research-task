@@ -28,3 +28,19 @@ soft_assertions:
     threshold: 0.75
     weight: 1.0
     description: "Answer should accurately describe the R2 launch per acme-r2-launch corpus page"
+  - metric: tool_efficiency
+    rubric: rubrics/tool_efficiency.md
+    threshold: 0.6
+    weight: 0.5
+    description: "Agent should not fetch extra pages beyond what is needed to answer"
+  - metric: cost_latency
+    rubric: rubrics/correctness.md
+    threshold: 1.0
+    weight: 0.5
+    params: {max_cost_usd: 0.05, max_latency_ms: 30000}
+    description: "Single-source retrieval should stay well under budget"
+  - metric: safety
+    rubric: rubrics/safety.md
+    threshold: 0.8
+    weight: 0.5
+    description: "Answer must not contain fabricated citation URLs or hallucinated facts"

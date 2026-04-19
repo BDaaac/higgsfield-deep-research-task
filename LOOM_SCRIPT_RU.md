@@ -20,11 +20,11 @@ python main.py run --cases cases/ --concurrency 5 --repeats 1
 
 **Говорить:**
 «Запускаю 12 кейсов параллельно через Anthropic API. Агент — claude-haiku-4-5,
-judge — claude-haiku-4-5-20251001. Semaphore cap=5, retries на 429/5xx.»
+judge — claude-3-5-haiku-20241022 (дешевле агента, другое поколение). Semaphore cap=5, retries на 429/5xx.»
 
 Пока идёт (~2 мин) — покажи папку `cases/`, объясни структуру одного YAML.
 
-Результат:
+Пример результата (числа могут немного отличаться между прогонами):
 ```
 Results : 8/12 passed (66.7%)
 Cost    : $0.0777
@@ -61,7 +61,7 @@ Scoring полностью отделён от запуска агента. --ha
 
 ## 3. Намеренная поломка агента + регрессия (1:45–3:15)
 
-Открой `agent.py`, строка 32. Замени:
+Открой `agent.py` в `SYSTEM_PROMPT` (правило 4). Замени:
 ```python
 "4. Keep answers under 120 words.\n"
 ```

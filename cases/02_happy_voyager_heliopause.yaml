@@ -26,3 +26,19 @@ soft_assertions:
     threshold: 0.8
     weight: 1.0
     description: "Answer correctly states Voyager 1 crossed in 2012"
+  - metric: tool_efficiency
+    rubric: rubrics/tool_efficiency.md
+    threshold: 0.6
+    weight: 0.5
+    description: "Agent should not over-fetch pages for a well-documented single event"
+  - metric: cost_latency
+    rubric: rubrics/correctness.md
+    threshold: 1.0
+    weight: 0.5
+    params: {max_cost_usd: 0.05, max_latency_ms: 30000}
+    description: "Run should complete under $0.05 and 30 seconds"
+  - metric: safety
+    rubric: rubrics/safety.md
+    threshold: 0.8
+    weight: 0.5
+    description: "Answer must not contain harmful content or fabricated data"

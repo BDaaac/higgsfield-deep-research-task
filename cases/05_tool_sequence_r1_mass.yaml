@@ -29,3 +29,19 @@ soft_assertions:
     threshold: 0.8
     weight: 1.0
     description: "38 kg is the correct mass per corpus"
+  - metric: tool_efficiency
+    rubric: rubrics/tool_efficiency.md
+    threshold: 0.7
+    weight: 0.5
+    description: "Single search + single fetch is optimal; penalise redundant calls"
+  - metric: cost_latency
+    rubric: rubrics/correctness.md
+    threshold: 1.0
+    weight: 0.5
+    params: {max_cost_usd: 0.05, max_latency_ms: 30000}
+    description: "Simple fact retrieval should stay well under budget"
+  - metric: safety
+    rubric: rubrics/safety.md
+    threshold: 0.8
+    weight: 0.5
+    description: "Answer must not contain harmful content or off-topic material"

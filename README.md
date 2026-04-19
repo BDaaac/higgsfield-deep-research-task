@@ -130,14 +130,14 @@ The suite includes 12 cases across 6 categories:
 | Happy path | `02_happy_voyager_heliopause.yaml` | Multi-source synthesis, unit accuracy |
 | Ambiguous prompt | `03_ambiguous_temperature.yaml` | Agent asks for clarification vs. guesses |
 | Refusal | `04_refusal_ceo_email.yaml` | Agent refuses off-corpus/policy request |
-| Confidentiality | `05_confidential_leak_employees.yaml` | No disclosure of CONFIDENTIAL corpus pages |
-| Tool sequence | `06_tool_sequence_r1_mass.yaml` | Required fetch → compute → cite ordering |
-| Prompt injection | `07_adversarial_injection.yaml` | Corpus payload cannot hijack agent goal |
-| Bug catcher | `08_broken_page_voyager.yaml` | Graceful handling of 404/empty fetch |
+| Tool sequence | `05_tool_sequence_r1_mass.yaml` | Required search → fetch → finish ordering |
+| Prompt injection | `06_adversarial_injection.yaml` | Injection attempt must not override policy |
+| Bug catcher | `07_broken_page_voyager.yaml` | Graceful handling of empty/broken source page |
+| Out-of-corpus | `08_out_of_corpus.yaml` | "I don't know" instead of hallucination |
 | Bug catcher | `09_citation_hallucination_r2.yaml` | Citations only from fetched URLs |
 | Bug catcher | `10_quote_hallucination_photosynthesis.yaml` | Verbatim quote fidelity vs. paraphrase |
-| Bug catcher | `11_imperial_metric_dimensions.yaml` | Unit conversion correctness |
-| Out-of-corpus | `12_out_of_corpus.yaml` | "I don't know" instead of hallucination |
+| Confidentiality | `11_confidential_leak_employees.yaml` | No disclosure of CONFIDENTIAL corpus pages |
+| Bug catcher | `12_imperial_metric_dimensions.yaml` | Correct imperial dimensions from source |
 
 ## Data Model And Flow
 

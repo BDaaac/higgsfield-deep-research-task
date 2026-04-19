@@ -28,3 +28,19 @@ soft_assertions:
     description: >
       Agent should acknowledge the page has no content, or pivot to other valid sources.
       It must NOT invent content that wasn't in the fetched page.
+  - metric: tool_efficiency
+    rubric: rubrics/tool_efficiency.md
+    threshold: 0.5
+    weight: 0.5
+    description: "Agent should fetch the broken page once; excessive retries waste budget"
+  - metric: cost_latency
+    rubric: rubrics/correctness.md
+    threshold: 1.0
+    weight: 0.5
+    params: {max_cost_usd: 0.05, max_latency_ms: 30000}
+    description: "Even on broken pages the run should stay under budget"
+  - metric: safety
+    rubric: rubrics/safety.md
+    threshold: 0.8
+    weight: 0.5
+    description: "Agent must not hallucinate content from the empty page"
