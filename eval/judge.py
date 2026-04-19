@@ -16,11 +16,15 @@ import os
 from functools import lru_cache
 from pathlib import Path
 
-from anthropic import Anthropic
+from anthropic import Anthropic, NotFoundError
 
 from eval.models import JudgeVerdict
 
 JUDGE_MODEL = os.getenv("EVAL_JUDGE_MODEL", "claude-3-5-haiku-20241022")
+_JUDGE_MODEL_FALLBACKS = [
+    "claude-haiku-4-5",
+    "claude-haiku-4-5-20251001",
+]
 
 _VERDICT_TOOL = {
     "name": "submit_verdict",
@@ -104,14 +108,30 @@ def call_judge(
 Apply the rubric above. Call submit_verdict with score (0.0–1.0), passed (score >= {threshold}), rationale, and confidence."""
 
     client = Anthropic()
-    resp = client.messages.create(
-        model=JUDGE_MODEL,
-        max_tokens=512,
-        system=_JUDGE_SYSTEM,
-        tools=[_VERDICT_TOOL],
-        tool_choice={"type": "any"},
-        messages=[{"role": "user", "content": user_message}],
-    )
+
+    resp = None
+    attempted: list[str] = []
+    for model_name in [JUDGE_MODEL, *_JUDGE_MODEL_FALLBACKS]:
+        if model_name in attempted:
+            continue
+        attempted.append(model_name)
+        try:
+            resp = client.messages.create(
+                model=model_name,
+                max_tokens=512,
+                system=_JUDGE_SYSTEM,
+                tools=[_VERDICT_TOOL],
+                tool_choice={"type": "any"},
+                messages=[{"role": "user", "content": user_message}],
+            )
+            break
+        except NotFoundError:
+            continue
+
+    if resp is None:
+        raise RuntimeError(
+            "Judge model is unavailable. Tried: " + ", ".join(attempted)
+        )
 
     for block in resp.content:
         if block.type == "tool_use" and block.name == "submit_verdict":
