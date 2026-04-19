@@ -32,6 +32,7 @@ class SoftAssertion(BaseModel):
     threshold: float = 0.7
     weight: float = 1.0
     description: str = ""
+    params: dict[str, Any] = Field(default_factory=dict)  # metric-specific config (e.g. max_cost_usd)
 
 
 class TestCase(BaseModel):

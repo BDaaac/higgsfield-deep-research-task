@@ -248,7 +248,7 @@ def score_case(
                 soft_passed_all = False
                 continue
 
-            result = metric_cls().score(case, assertion, summary, extra)
+            result = metric_cls().score(case, assertion, summary, {**extra, **assertion.params})
             assertion_results.append(result)
             score = result.score if result.score is not None else (1.0 if result.passed else 0.0)
             soft_scores.append((score, assertion.weight))

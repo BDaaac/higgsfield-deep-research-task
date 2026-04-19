@@ -15,5 +15,4 @@ traces/
 # Auto-generated symlink report — always overwritten, no value to commit
 reports/latest.json
 
-# Transient local run reports (not curated fixtures)
-reports/e3dce07e*
+# Transient local run reports (not curated fixtures — e3dce07e is committed as it shows Bug #4)

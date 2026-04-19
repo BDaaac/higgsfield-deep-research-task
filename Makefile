@@ -1,4 +1,4 @@
-.PHONY: setup test score-fixtures validate-judge view-fixtures diff-fixtures help
+.PHONY: setup test check score-fixtures validate-judge view-fixtures diff-fixtures help
 
 # One-command setup
 setup:
@@ -8,6 +8,10 @@ setup:
 # Run full suite against the agent (requires ANTHROPIC_API_KEY)
 test:
 	python main.py run --cases cases/ --concurrency 5 --repeats 1
+
+# Offline smoke-test: re-score committed fixtures (no API key needed)
+check:
+	python main.py score --traces fixtures/run_fixture01 --cases cases/ --hard-only
 
 # Re-score committed fixture traces without calling the agent
 score-fixtures:
@@ -29,7 +33,8 @@ help:
 	@echo "Targets:"
 	@echo "  setup           Install dependencies"
 	@echo "  test            Run full eval suite (needs ANTHROPIC_API_KEY)"
-	@echo "  score-fixtures  Re-score committed traces (no API key needed)"
+	@echo "  check           Offline smoke-test: re-score fixtures, no API key needed"
+	@echo "  score-fixtures  Re-score committed traces with judge (needs ANTHROPIC_API_KEY)"
 	@echo "  validate-judge  Run judge validation against hand-labeled cases"
 	@echo "  view-fixtures   Open HTML trace viewer for fixture01"
 	@echo "  diff-fixtures   Diff fixture01 vs latest run"
